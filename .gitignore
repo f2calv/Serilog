@@ -368,3 +368,4 @@ _DockerCompose/azurite
 _DockerCompose/redis
 #local.settings.json
 .vscode/
+log*.txt

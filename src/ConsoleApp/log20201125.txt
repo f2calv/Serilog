@@ -1,4 +1,0 @@
-2020-11-25 16:59:36.525 +01:00 [INF] Hello, Serilog!
-2020-11-25 16:59:36.611 +01:00 [INF] Processed {"Latitude":25,"Longitude":134} in 34 ms.
-2020-11-25 17:00:35.231 +01:00 [INF] Hello, Serilog!
-2020-11-25 17:00:35.306 +01:00 [INF] Processed {"Latitude":25,"Longitude":134} in 34 ms.
