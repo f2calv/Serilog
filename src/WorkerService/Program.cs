@@ -1,17 +1,12 @@
+using CasCap.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CasCap.Services;
 using Serilog;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using Serilog.Events;
 using Serilog.Core;
+using Serilog.Events;
+using System.IO;
 using System.Threading;
-
 namespace CasCap
 {
     public class Program
@@ -22,8 +17,13 @@ namespace CasCap
             //    .AddJsonFile("appsettings.json")
             //    .Build();
 
+            var levelSwitch = new LoggingLevelSwitch();//this would have to be a singleton or something and passed in?
+
+            //levelSwitch.MinimumLevel = LogEventLevel.Verbose;
+            //log.Verbose("This will now be logged");
+
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
+                .MinimumLevel.ControlledBy(levelSwitch)
                 .Enrich.WithProperty("Version", "1.0.0")//const enricher
                 .Enrich.With(new ThreadIdEnricher())//dynamic enricher
 
