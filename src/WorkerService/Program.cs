@@ -8,6 +8,10 @@ using CasCap.Services;
 using Serilog;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Serilog.Events;
+using Serilog.Core;
+using System.Threading;
+
 namespace CasCap
 {
     public class Program
@@ -20,7 +24,10 @@ namespace CasCap
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.Console()
+                .Enrich.With(new ThreadIdEnricher())
+                //.WriteTo.Console()
+                .WriteTo.Console(
+                    outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
                 .WriteTo.File("log.txt",
                     rollingInterval: RollingInterval.Day,
                     rollOnFileSizeLimit: true)
@@ -46,5 +53,14 @@ namespace CasCap
                     services.AddHostedService<WorkerService>();
                 })
             ;
+    }
+
+    class ThreadIdEnricher : ILogEventEnricher
+    {
+        public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+        {
+            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(
+                    "ThreadId", Thread.CurrentThread.ManagedThreadId));
+        }
     }
 }

@@ -9,3 +9,4 @@ Playground...
 - https://github.com/deadlydog/Sample.Serilog
 - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-5.0
 - https://softwareengineering.stackexchange.com/questions/312197/benefits-of-structured-logging-vs-basic-logging
+- https://github.com/justeat/NLog.StructuredLogging.Json#best-practices
