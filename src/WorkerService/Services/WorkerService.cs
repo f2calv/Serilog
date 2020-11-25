@@ -18,8 +18,22 @@ namespace CasCap.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(1000, stoppingToken);
+                var utcNow = DateTime.UtcNow;
+
+                _logger.LogInformation($"Worker running at: {utcNow}");
+
+                _logger.LogInformation("Worker running at: {utcNow}", utcNow);
+
+                var fruit = new[] { "Apple", "Pear", "Orange" };
+                _logger.LogInformation("In my bowl I have {@fruit}", fruit);
+
+                var sensorInput = new { Latitude = 25, Longitude = 134 };
+                _logger.LogInformation("Processing {@SensorInput}", sensorInput);
+
+                var obj1 = new TestObj();
+                _logger.LogDebug("here is my test object {@obj1}", obj1);
+
+                await Task.Delay(10_000, stoppingToken);
             }
         }
     }

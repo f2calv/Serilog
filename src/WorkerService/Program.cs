@@ -24,7 +24,8 @@ namespace CasCap
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .Enrich.With(new ThreadIdEnricher())
+                .Enrich.WithProperty("Version", "1.0.0")//const enricher
+                .Enrich.With(new ThreadIdEnricher())//dynamic enricher
                 //.WriteTo.Console()
                 .WriteTo.Console(
                     outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
