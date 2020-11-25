@@ -26,6 +26,10 @@ namespace CasCap
                 .MinimumLevel.Debug()
                 .Enrich.WithProperty("Version", "1.0.0")//const enricher
                 .Enrich.With(new ThreadIdEnricher())//dynamic enricher
+
+                .Destructure.ByTransforming<TestObj>(
+                    r => new { dt = r.utcNow, sid = r.id.ToString(), wibble = "wobble" })
+
                 //.WriteTo.Console()
                 .WriteTo.Console(
                     outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
