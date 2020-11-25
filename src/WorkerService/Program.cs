@@ -5,7 +5,10 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Sinks.Elasticsearch;
+using System;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 namespace CasCap
 {
@@ -21,6 +24,7 @@ namespace CasCap
 
             //levelSwitch.MinimumLevel = LogEventLevel.Verbose;
             //log.Verbose("This will now be logged");
+            var environment = "Development";
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.ControlledBy(levelSwitch)
@@ -36,6 +40,25 @@ namespace CasCap
                 .WriteTo.File("log.txt",
                     rollingInterval: RollingInterval.Day,
                     rollOnFileSizeLimit: true)
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                {
+                    //IndexFormat = "workerservice-{0:yyyy.MM.dd}",
+                    //IndexFormat = AppDomain.CurrentDomain.FriendlyName + "-{0:yyyy.MM}",
+                    //IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+                    AutoRegisterTemplate = true,
+                    AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
+                    //IndexFormat = "AdminLogs-{0:yyyy.MM.dd}",
+                    //OverwriteTemplate = true,
+                    //RegisterTemplateFailure = RegisterTemplateRecovery.IndexToDeadletterIndex,
+                    EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
+                                       EmitEventFailureHandling.RaiseCallback |
+                                       EmitEventFailureHandling.ThrowException |
+                                       EmitEventFailureHandling.WriteToSelfLog,
+                    FailureCallback = e =>
+                    {
+                        Console.WriteLine("Unable to submit event " + e.MessageTemplate);
+                    }
+                })
                 //.ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
