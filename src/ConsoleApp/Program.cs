@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using Serilog.Formatting.Elasticsearch;
 using System;
 namespace CasCap
 {
@@ -9,7 +10,9 @@ namespace CasCap
             Console.WriteLine("Hello World!");
 
             var log = new LoggerConfiguration()
-                .WriteTo.Console()
+                .Enrich.FromLogContext()
+                //.WriteTo.Console()
+                .WriteTo.Console(new ElasticsearchJsonFormatter())
                 //.WriteTo.File("log.txt")
                 .WriteTo.File("log.txt",
                     rollingInterval: RollingInterval.Day,
