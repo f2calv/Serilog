@@ -38,8 +38,8 @@ services:
     - filebeat
     networks:
     - elastic
-    logging:
-      driver: none #suppress all logging
+    #logging:
+    #  driver: none #suppress all logging
 
   # workerservice:
   #   container_name: workerservice
