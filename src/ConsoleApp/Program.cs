@@ -13,7 +13,7 @@ namespace CasCap
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
+                //.Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithExceptionDetails()
 
