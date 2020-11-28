@@ -3,7 +3,7 @@ version: '3.8'
 services:
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
     ports:
     - 9200:9200
     volumes:
@@ -17,7 +17,7 @@ services:
   
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:7.10.0
+    image: docker.elastic.co/kibana/kibana:7.9.3
     ports:
     - 5601:5601
     depends_on:
@@ -30,24 +30,30 @@ services:
   consoleapp:
     container_name: consoleapp
     build:
-       context: .
-       dockerfile: src/ConsoleApp/Dockerfile
+      context: .
+      dockerfile: src/ConsoleApp/Dockerfile
     depends_on:
     - elasticsearch
     - kibana
     - filebeat
+    networks:
+    - elastic
+    logging:
+      driver: none #suppress all logging
 
   # workerservice:
   #   container_name: workerservice
   #   build:
-  #      context: .
-  #      dockerfile: src/WorkerService/Dockerfile
+  #     context: .
+  #     dockerfile: src/WorkerService/Dockerfile
   #   depends_on:
   #   - elasticsearch
   #   - kibana
+  #   networks:
+  #   - elastic
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:7.10.0
+    image: docker.elastic.co/beats/filebeat:7.9.3
     container_name: filebeat
     depends_on:
     - elasticsearch
@@ -58,8 +64,8 @@ services:
     - ./mysql_data/_data
     - /var/run/docker.sock:/var/run/docker.sock
     - /var/lib/docker:/var/lib/docker:ro
-    #networks:
-    #- elastic
+    networks:
+    - elastic
 
 
 networks:

@@ -1,8 +1,20 @@
 filebeat.inputs:
+#https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-input-container.html
 - type: container
+  #stream: all #Reads from the specified streams only: all, stdout or stderr. The default is all
   paths: 
   - '/var/lib/docker/containers/*/*.log'
+  #exclude_lines: ['^DBG']
+  #include_lines: ['^ERR', '^WARN']
+# - type: log
+#   paths:
+#   - '/var/lib/docker/containers/*/*.log'
+#   json.message_key: log
+#   json.keys_under_root: true
+#   processors:
+#   - add_docker_metadata: ~
 
+#https://www.elastic.co/guide/en/beats/filebeat/master/add-docker-metadata.html
 processors:
 - add_docker_metadata:
     host: "unix:///var/run/docker.sock"
@@ -17,7 +29,15 @@ output.elasticsearch:
   indices:
   - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
+#logging.level: debug
 logging.to_files: true
 logging.to_syslog: false
+logging.to_stderr: true
 logging.json: true
 logging.metrics.enabled: false
+
+
+setup.kibana:
+  host: "kibana:5601" 
+  #username: "my_kibana_user"  
+  #password: "{pwd}"
