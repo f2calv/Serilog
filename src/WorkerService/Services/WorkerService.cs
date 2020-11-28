@@ -37,6 +37,17 @@ namespace CasCap.Services
                 var obj1 = new TestObj();
                 _logger.LogDebug("here is my test object {@obj1}", obj1);
 
+
+                try
+                {
+                    string test = null;
+                    var indexOf = test.IndexOf(':');
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "indexof failed");
+                }
+
                 await Task.Delay(10_000, stoppingToken);
             }
         }

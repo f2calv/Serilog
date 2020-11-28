@@ -9,7 +9,6 @@ services:
     volumes:
     - /c/temp/_DockerCompose/elasticsearch-data:/usr/share/elasticsearch/data
     environment:  
-    - xpack.monitoring.enabled=true
     - xpack.watcher.enabled=false
     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     - discovery.type=single-node
@@ -42,7 +41,6 @@ services:
     container_name: filebeat
     depends_on:
     - elasticsearch
-    #user: root
     volumes:
     - /c/temp/_DockerCompose/filebeat/data:/usr/share/filebeat/data:rw
     - /c/temp/_DockerCompose/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
