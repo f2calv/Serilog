@@ -1,31 +1,45 @@
-﻿using Serilog;
+﻿using CasCap.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Exceptions;
 using Serilog.Formatting.Elasticsearch;
-using System;
+using System.IO;
 namespace CasCap
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-
-            var log = new LoggerConfiguration()
+            Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithExceptionDetails()
+
                 //.WriteTo.Console()
                 .WriteTo.Console(new ElasticsearchJsonFormatter())
-                //.WriteTo.File("log.txt")
-                .WriteTo.File("log.txt",
-                    rollingInterval: RollingInterval.Day,
-                    rollOnFileSizeLimit: true)
+                .WriteTo.Console(new ExceptionAsObjectJsonFormatter())
+
                 .CreateLogger();
 
-            log.Information("Hello, Serilog!");
-
-            var position = new { Latitude = 25, Longitude = 134 };
-            var elapsedMs = 34;
-
-            log.Information("Processed {@Position} in {Elapsed} ms.", position, elapsedMs);
-            Console.ReadLine();
+            CreateHostBuilder(args).Build().Run();
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureHostConfiguration(configHost =>
+                {
+                    configHost.SetBasePath(Directory.GetCurrentDirectory());
+                    configHost.AddJsonFile("appsettings.json", optional: false);
+                })
+                .ConfigureLogging((hostContext, logging) =>
+                {
+                    logging.AddSerilog();
+                })
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddHostedService<WorkerService>();
+                });
     }
 }
