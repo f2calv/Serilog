@@ -15,7 +15,7 @@ services:
     networks:
     - elastic
   
-  kibana:  
+  kibana:
     container_name: kibana
     image: docker.elastic.co/kibana/kibana:7.10.0
     ports:
@@ -27,14 +27,24 @@ services:
     networks:
     - elastic
 
-  workerservice:
-    container_name: workerservice
+  consoleapp:
+    container_name: consoleapp
     build:
        context: .
-       dockerfile: src/WorkerService/Dockerfile
+       dockerfile: src/ConsoleApp/Dockerfile
     depends_on:
     - elasticsearch
     - kibana
+    - filebeat
+
+  # workerservice:
+  #   container_name: workerservice
+  #   build:
+  #      context: .
+  #      dockerfile: src/WorkerService/Dockerfile
+  #   depends_on:
+  #   - elasticsearch
+  #   - kibana
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.10.0
@@ -43,7 +53,9 @@ services:
     - elasticsearch
     volumes:
     - /c/temp/_DockerCompose/filebeat/data:/usr/share/filebeat/data:rw
-    - /c/temp/_DockerCompose/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    #- /c/temp/_DockerCompose/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    - ./mysql_data/_data
     - /var/run/docker.sock:/var/run/docker.sock
     - /var/lib/docker:/var/lib/docker:ro
     #networks:
