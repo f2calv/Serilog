@@ -1,15 +1,11 @@
 using CasCap.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Exceptions;
-using Serilog.Sinks.Elasticsearch;
-using System;
-using System.IO;
-using System.Reflection;
 using System.Threading;
 namespace CasCap
 {
@@ -84,13 +80,9 @@ namespace CasCap
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureHostConfiguration(configHost =>
-                {
-                    configHost.SetBasePath(Directory.GetCurrentDirectory());
-                    configHost.AddJsonFile("appsettings.json", optional: false);
-                })
                 .ConfigureLogging((hostContext, logging) =>
                 {
+                    logging.ClearProviders();
                     logging.AddSerilog();
                 })
                 .ConfigureServices((hostContext, services) =>

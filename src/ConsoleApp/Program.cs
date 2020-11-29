@@ -1,11 +1,10 @@
 ﻿using CasCap.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Formatting.Elasticsearch;
-using System.IO;
 namespace CasCap
 {
     public class Program
@@ -18,7 +17,7 @@ namespace CasCap
                 .Enrich.WithExceptionDetails()
 
                 //.WriteTo.Console()
-                .WriteTo.Console(new ElasticsearchJsonFormatter())
+                //.WriteTo.Console(new ElasticsearchJsonFormatter())
                 .WriteTo.Console(new ExceptionAsObjectJsonFormatter())
 
                 .CreateLogger();
@@ -28,13 +27,10 @@ namespace CasCap
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureHostConfiguration(configHost =>
-                {
-                    configHost.SetBasePath(Directory.GetCurrentDirectory());
-                    configHost.AddJsonFile("appsettings.json", optional: false);
-                })
+                .ConfigureAppConfiguration((hostContext, config) => { })
                 .ConfigureLogging((hostContext, logging) =>
                 {
+                    logging.ClearProviders();//remove existing providers
                     logging.AddSerilog();
                 })
                 .ConfigureServices((hostContext, services) =>
