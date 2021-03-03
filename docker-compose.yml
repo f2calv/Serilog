@@ -1,31 +1,31 @@
-version: '3.8'  
+version: "3.8"
 
 services:
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
     ports:
-    - 9200:9200
+      - 9200:9200
     volumes:
-    - /c/temp/_DockerCompose/elasticsearch-data:/usr/share/elasticsearch/data
-    environment:  
-    - xpack.watcher.enabled=false
-    - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    - discovery.type=single-node
+      - /c/temp/_DockerCompose/elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - xpack.watcher.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
     networks:
-    - elastic
-  
+      - elastic
+
   kibana:
     container_name: kibana
     image: docker.elastic.co/kibana/kibana:7.9.3
     ports:
-    - 5601:5601
+      - 5601:5601
     depends_on:
-    - elasticsearch
+      - elasticsearch
     environment:
-    - ELASTICSEARCH_URL=http://localhost:9200
+      - ELASTICSEARCH_URL=http://localhost:9200
     networks:
-    - elastic
+      - elastic
 
   consoleapp:
     container_name: consoleapp
@@ -33,11 +33,11 @@ services:
       context: .
       dockerfile: src/ConsoleApp/Dockerfile
     depends_on:
-    - elasticsearch
-    - kibana
-    - filebeat
+      - elasticsearch
+      - kibana
+      - filebeat
     networks:
-    - elastic
+      - elastic
     #logging:
     #  driver: none #suppress all logging
 
@@ -57,20 +57,20 @@ services:
     image: docker.elastic.co/beats/filebeat:7.9.3
     container_name: filebeat
     depends_on:
-    - elasticsearch
+      - elasticsearch
     user: root
     volumes:
-    - /c/temp/_DockerCompose/filebeat/data:/usr/share/filebeat/data:rw
-    #- /c/temp/_DockerCompose/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-    - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-    - /var/run/docker.sock:/var/run/docker.sock
-    - /var/lib/docker:/var/lib/docker:ro
+      - /c/temp/_DockerCompose/filebeat/data:/usr/share/filebeat/data:rw
+      #- /c/temp/_DockerCompose/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker:/var/lib/docker:ro
     networks:
-    - elastic
+      - elastic
 
 networks:
   elastic:
     driver: bridge
-  
+
 volumes:
   elasticsearch-data:

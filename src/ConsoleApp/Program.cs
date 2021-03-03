@@ -1,41 +1,61 @@
-﻿using CasCap.Services;
-using Microsoft.Extensions.DependencyInjection;
+﻿using CasCap;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Enrichers.OpenTracing;
+using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Formatting.Elasticsearch;
-namespace CasCap
+using Serilog.Sinks.SystemConsole.Themes;
+using System;
+
+//preload basic serilog settings from local json file
+var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+var loggerConfiguration = new LoggerConfiguration().ReadFrom.Configuration(config);
+
+//set-up application insights telemetry sink (optional)
+var instrumentationKey = config["CasCap:AppInsightsConfig:InstrumentationKey"];
+if (!string.IsNullOrWhiteSpace(instrumentationKey))
 {
-    public class Program
-    {
-        public static void Main(string[] args)
+    var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+    telemetryConfiguration.InstrumentationKey = instrumentationKey;
+    loggerConfiguration.WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces, restrictedToMinimumLevel: LogEventLevel.Error);
+}
+
+//add all the log enrichers
+Log.Logger = loggerConfiguration
+    .Enrich.FromLogContext()
+    //.Enrich.WithMachineName()
+    .Enrich.WithEnvironmentUserName()
+    .Enrich.WithProcessId()
+    .Enrich.WithThreadId()
+    .Enrich.WithExceptionDetails()
+    .Enrich.WithAssemblyName()
+    .Enrich.WithOpenTracingContext()
+    //.WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)//local development pretty print console logging 
+    .WriteTo.Console(new ElasticsearchJsonFormatter())
+    //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production
+    //.Filter.ByExcluding($"RequestPath like '/healthz%'")
+    .CreateLogger();
+try
+{
+    Log.Information("Starting {AppName}", AppDomain.CurrentDomain.FriendlyName);
+    Host.CreateDefaultBuilder(args)
+        .ConfigureAppConfiguration((hostContext, config) => { })
+        .ConfigureWebHostDefaults(webBuilder =>
         {
-            Log.Logger = new LoggerConfiguration()
-                //.Enrich.FromLogContext()
-                .Enrich.WithMachineName()
-                .Enrich.WithExceptionDetails()
-
-                //.WriteTo.Console()
-                //.WriteTo.Console(new ElasticsearchJsonFormatter())
-                .WriteTo.Console(new ExceptionAsObjectJsonFormatter())
-
-                .CreateLogger();
-
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostContext, config) => { })
-                .ConfigureLogging((hostContext, logging) =>
-                {
-                    logging.ClearProviders();//remove existing providers
-                    logging.AddSerilog();
-                })
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddHostedService<WorkerService>();
-                });
-    }
+            webBuilder.UseStartup<Startup>();
+        })
+        .UseSerilog()
+        .Build().Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "{AppName} terminated unexpectedly", AppDomain.CurrentDomain.FriendlyName);
+}
+finally
+{
+    Log.CloseAndFlush();
 }

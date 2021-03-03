@@ -1,6 +1,6 @@
 # Serilog w/Elasticsearch Sink
 
-Playground working with Serilog with it's structured logging and sending the log data to Elasticsearch and viewing with Kibana.
+Playground working with Serilog and the structured logging it provides which sends the log data to Elasticsearch and we can then view with Kibana.
 
 To run the demo;
 
