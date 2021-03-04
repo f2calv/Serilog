@@ -88,6 +88,8 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=Pas.sword@12345
+    networks:
+      - elastic
 
 networks:
   elastic:

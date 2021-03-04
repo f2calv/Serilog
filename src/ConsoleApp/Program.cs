@@ -40,7 +40,7 @@ Log.Logger = loggerConfiguration
     //.WriteTo.Console(new ElasticsearchJsonFormatter())
     //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production
     .WriteTo.MSSqlServer(
-        connectionString: "Server=localhost;Database=Serilog;User Id=sa;Password=Pas.sword@12345;",
+        connectionString: "Server=mssql;Database=Serilog;User Id=sa;Password=Pas.sword@12345;",
         sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents", AutoCreateSqlTable = true })
     //.Filter.ByExcluding($"RequestPath like '/healthz%'")
     .CreateLogger();
