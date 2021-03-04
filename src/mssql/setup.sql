@@ -1,0 +1,13 @@
+CREATE DATABASE TodoDb;
+GO
+
+USE TodoDb;
+GO
+
+CREATE TABLE TodoItems
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Description NVARCHAR(MAX) NOT NULL,
+    IsCompleted BIT DEFAULT(0),
+    CreatedOn DATETIME DEFAULT(GETUTCDATE())
+)
