@@ -8,9 +8,13 @@ namespace CasCap
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        readonly IConfiguration _configuration;
+        readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
-            Configuration = configuration;
+            _configuration = configuration;
+            _env = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -19,6 +23,13 @@ namespace CasCap
         {
             services.AddControllers();
             services.AddHostedService<WorkerService>();
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.EnableDependencyTrackingTelemetryModule = false;
+                options.EnablePerformanceCounterCollectionModule = false;
+                options.DeveloperMode = _env.IsDevelopment();
+                options.InstrumentationKey = _configuration["CasCap:AppInsightsConfig:InstrumentationKey"];
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
