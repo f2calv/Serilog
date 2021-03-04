@@ -1,9 +1,12 @@
+using System;
 using CasCap.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog.Debugging;
+
 namespace CasCap
 {
     public class Startup
@@ -23,21 +26,24 @@ namespace CasCap
         {
             services.AddControllers();
             services.AddHostedService<WorkerService>();
-            services.AddApplicationInsightsTelemetry(options =>
+            var instrumentationKey = _configuration["CasCap:AppInsightsConfig:InstrumentationKey"];
+            if (!string.IsNullOrWhiteSpace(instrumentationKey))
             {
-                options.EnableDependencyTrackingTelemetryModule = false;
-                options.EnablePerformanceCounterCollectionModule = false;
-                options.DeveloperMode = _env.IsDevelopment();
-                options.InstrumentationKey = _configuration["CasCap:AppInsightsConfig:InstrumentationKey"];
-            });
+                services.AddApplicationInsightsTelemetry(options =>
+                {
+                    options.EnableDependencyTrackingTelemetryModule = false;
+                    options.EnablePerformanceCounterCollectionModule = false;
+                    options.DeveloperMode = _env.IsDevelopment();
+                    options.InstrumentationKey = _configuration["CasCap:AppInsightsConfig:InstrumentationKey"];
+                });
+            }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            SelfLog.Enable(msg => Console.WriteLine(msg));
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
 
             app.UseRouting();
 

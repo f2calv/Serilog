@@ -8,6 +8,7 @@ using Serilog.Enrichers.OpenTracing;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Formatting.Elasticsearch;
+using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
 
@@ -34,9 +35,13 @@ Log.Logger = loggerConfiguration
     .Enrich.WithExceptionDetails()
     .Enrich.WithAssemblyName()
     .Enrich.WithOpenTracingContext()
-    .WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)//local development pretty print console logging 
+    .WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)//local development pretty print console logging
+    .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
     //.WriteTo.Console(new ElasticsearchJsonFormatter())
     //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production
+    .WriteTo.MSSqlServer(
+        connectionString: "Server=localhost;Database=Serilog;User Id=sa;Password=Pas.sword@12345;",
+        sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents", AutoCreateSqlTable = true })
     //.Filter.ByExcluding($"RequestPath like '/healthz%'")
     .CreateLogger();
 try

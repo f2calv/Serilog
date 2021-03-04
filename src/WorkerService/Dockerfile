@@ -6,10 +6,9 @@ COPY ["src/SharedLibrary/SharedLibrary.csproj", "src/SharedLibrary/"]
 RUN dotnet restore "src/WorkerService/WorkerService.csproj"
 COPY . .
 
-FROM build AS publish
 RUN dotnet publish "/src/src/WorkerService/WorkerService.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/core/runtime:3.1-buster-slim AS final
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "WorkerService.dll"]
