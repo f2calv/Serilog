@@ -35,9 +35,9 @@ Log.Logger = loggerConfiguration
     .Enrich.WithAssemblyName()
     .Enrich.WithOpenTracingContext()
     .WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)//local development pretty print console logging 
-                                                                                      //.WriteTo.Console(new ElasticsearchJsonFormatter())
-                                                                                      //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production
-                                                                                      //.Filter.ByExcluding($"RequestPath like '/healthz%'")
+    //.WriteTo.Console(new ElasticsearchJsonFormatter())
+    //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production
+    //.Filter.ByExcluding($"RequestPath like '/healthz%'")
     .CreateLogger();
 try
 {
