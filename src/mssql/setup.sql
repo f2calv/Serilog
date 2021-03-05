@@ -1,6 +1,11 @@
 CREATE DATABASE Serilog;
 GO
 
+IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'Serilog')
+BEGIN
+    CREATE DATABASE [Serilog]
+END
+
 -- CREATE TABLE [Logs]
 -- (
 --    [Id] int IDENTITY(1,1) NOT NULL,

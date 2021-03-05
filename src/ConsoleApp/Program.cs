@@ -1,4 +1,5 @@
 ﻿using CasCap;
+using CasCap.Models;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,15 +14,16 @@ using Serilog.Sinks.SystemConsole.Themes;
 using System;
 
 //preload basic serilog settings from local json file
-var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile("appsettings.Development.json", optional: true).Build();
-var loggerConfiguration = new LoggerConfiguration().ReadFrom.Configuration(config);
+var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true).Build();
+var loggerConfiguration = new LoggerConfiguration().ReadFrom.Configuration(configuration);
+var appInsightsConfig = configuration.GetSection($"{nameof(CasCap)}:{nameof(AppInsightsConfig)}").Get<AppInsightsConfig>();
+var connectionStrings = configuration.GetSection(nameof(ConnectionStrings)).Get<ConnectionStrings>();
 
 //set-up application insights telemetry sink (optional)
-var instrumentationKey = config["CasCap:AppInsightsConfig:InstrumentationKey"];
-if (!string.IsNullOrWhiteSpace(instrumentationKey))
+if (!string.IsNullOrWhiteSpace(appInsightsConfig.InstrumentationKey))
 {
     var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
-    telemetryConfiguration.InstrumentationKey = instrumentationKey;
+    telemetryConfiguration.InstrumentationKey = appInsightsConfig.InstrumentationKey;
     loggerConfiguration.WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces, restrictedToMinimumLevel: LogEventLevel.Debug);
 }
 
@@ -38,9 +40,9 @@ Log.Logger = loggerConfiguration
     .WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)//local development pretty print console logging
     .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
     //.WriteTo.Console(new ElasticsearchJsonFormatter())
-    //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production
+    //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production+filebeat
     .WriteTo.MSSqlServer(
-        connectionString: "Server=mssql;Database=Serilog;User Id=sa;Password=Pas.sword@12345;",
+        connectionString: connectionStrings.mssql,
         sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents", AutoCreateSqlTable = true })
     //.Filter.ByExcluding($"RequestPath like '/healthz%'")
     .CreateLogger();

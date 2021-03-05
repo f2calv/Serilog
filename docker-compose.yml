@@ -1,19 +1,19 @@
 version: "3.8"
 
 services:
-  consoleapp:
-    container_name: consoleapp
-    build:
-      context: .
-      dockerfile: src/ConsoleApp/Dockerfile
-    # depends_on:
-    #   - elasticsearch
-    #   - kibana
-    #   - filebeat
-    networks:
-      - elastic
-    #logging:
-    #  driver: none #suppress all logging
+  # consoleapp:
+  #   container_name: consoleapp
+  #   build:
+  #     context: .
+  #     dockerfile: src/ConsoleApp/Dockerfile
+  #   # depends_on:
+  #   #   - elasticsearch
+  #   #   - kibana
+  #   #   - filebeat
+  #   networks:
+  #     - elastic
+  #   #logging:
+  #   #  driver: none #suppress all logging
 
   # workerservice:
   #   container_name: workerservice
@@ -72,12 +72,12 @@ services:
   #https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-docker-container-deployment
   #docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Pas.sword@12345' -p 1433:1433 --name mssql -h mssql -d mcr.microsoft.com/mssql/server:2019-latest
   #docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Pas.sword@12345" -p 1433:1433 --name mssql -h mssql --rm -it mcr.microsoft.com/mssql/server:2019-latest
-  mssql:
+  mssql-svc:
     #image: mcr.microsoft.com/mssql/server:2019-latest
     build:
       context: .
       dockerfile: src/mssql/Dockerfile
-    container_name: mssql
+    container_name: mssql-svc
     restart: always
     ports:
       - 1433:1433
@@ -88,8 +88,8 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=Pas.sword@12345
-    networks:
-      - elastic
+    # networks:
+    #   - elastic
 
 networks:
   elastic:

@@ -1,4 +1,4 @@
-using System;
+using CasCap.Models;
 using CasCap.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog.Debugging;
-
+using System;
 namespace CasCap
 {
     public class Startup
@@ -24,17 +24,18 @@ namespace CasCap
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var appInsightsConfig = _configuration.GetSection($"{nameof(CasCap)}:{nameof(AppInsightsConfig)}").Get<AppInsightsConfig>();
+
             services.AddControllers();
             services.AddHostedService<WorkerService>();
-            var instrumentationKey = _configuration["CasCap:AppInsightsConfig:InstrumentationKey"];
-            if (!string.IsNullOrWhiteSpace(instrumentationKey))
+            if (!string.IsNullOrWhiteSpace(appInsightsConfig.InstrumentationKey))
             {
                 services.AddApplicationInsightsTelemetry(options =>
                 {
                     options.EnableDependencyTrackingTelemetryModule = false;
                     options.EnablePerformanceCounterCollectionModule = false;
                     options.DeveloperMode = _env.IsDevelopment();
-                    options.InstrumentationKey = _configuration["CasCap:AppInsightsConfig:InstrumentationKey"];
+                    options.InstrumentationKey = appInsightsConfig.InstrumentationKey;
                 });
             }
         }
