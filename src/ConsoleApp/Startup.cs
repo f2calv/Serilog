@@ -2,10 +2,13 @@ using CasCap.Models;
 using CasCap.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using Serilog.Debugging;
+using Serilog.Events;
 using System;
 namespace CasCap
 {
@@ -24,10 +27,10 @@ namespace CasCap
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var appInsightsConfig = _configuration.GetSection($"{nameof(CasCap)}:{nameof(AppInsightsConfig)}").Get<AppInsightsConfig>();
-
             services.AddControllers();
             services.AddHostedService<WorkerService>();
+
+            var appInsightsConfig = _configuration.GetSection($"{nameof(CasCap)}:{nameof(AppInsightsConfig)}").Get<AppInsightsConfig>();
             if (!string.IsNullOrWhiteSpace(appInsightsConfig.InstrumentationKey))
             {
                 services.AddApplicationInsightsTelemetry(options =>
@@ -40,11 +43,15 @@ namespace CasCap
             }
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            SelfLog.Enable(msg => Console.WriteLine(msg));
-            if (env.IsDevelopment())
+            if (_env.IsDevelopment())
+            {
+                SelfLog.Enable(msg => Console.WriteLine(msg));
                 app.UseDeveloperExceptionPage();
+            }
+            //app.UseSerilogRequestLogging(options => { options.GetLevel = LogHelper.CustomGetLevel; });
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
@@ -54,6 +61,19 @@ namespace CasCap
             {
                 endpoints.MapControllers();
             });
+        }
+    }
+
+    public static class LogHelper
+    {
+        public static LogEventLevel CustomGetLevel(HttpContext ctx, double _, Exception ex)
+        {
+            //return ex != null
+            //    ? LogEventLevel.Error
+            //    : ctx.Response.StatusCode > 499
+            //    ? LogEventLevel.Error
+            //    : LogEventLevel.Debug; //Debug instead of Information
+            return LogEventLevel.Debug;
         }
     }
 }
