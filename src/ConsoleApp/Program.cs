@@ -44,6 +44,7 @@ Log.Logger = loggerConfiguration
     .WriteTo.MSSqlServer(
         connectionString: connectionStrings.mssql,
         sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents", AutoCreateSqlTable = true })
+    .WriteTo.Seq(connectionStrings.seq)
     //.Filter.ByExcluding($"RequestPath like '/healthz%'")
     .CreateLogger();
 try

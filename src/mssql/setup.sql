@@ -1,10 +1,11 @@
-CREATE DATABASE Serilog;
-GO
-
 IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'Serilog')
-BEGIN
-    CREATE DATABASE [Serilog]
-END
+    BEGIN
+        CREATE DATABASE [Serilog]
+    END
+ELSE
+    BEGIN
+        PRINT 'Serilog database already exists, skipping creation...'
+    END
 
 -- CREATE TABLE [Logs]
 -- (

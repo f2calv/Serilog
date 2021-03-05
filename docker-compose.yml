@@ -91,9 +91,23 @@ services:
     # networks:
     #   - elastic
 
+  seq-svc:
+    image: datalust/seq
+    container_name: seq-svc
+    restart: always
+    ports:
+      - 5342:80 #web ui
+      - 5341:5341 #ingestion
+    volumes:
+      - /c/temp/_DockerCompose/seq/data/:/data/
+    environment:
+      - ACCEPT_EULA=Y
+      - BASE_URI=http://seq-svc:5342
+
 networks:
   elastic:
     driver: bridge
+    #external: true
 
 volumes:
   elasticsearch-data:
