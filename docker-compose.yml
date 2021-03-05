@@ -7,39 +7,43 @@ services:
   #     context: .
   #     dockerfile: src/webapi/Dockerfile
   #   # depends_on:
-  #   #   - elasticsearch
-  #   #   - kibana
+  #   #   - elasticsearch-svc
+  #   #   - kibana-svc
   #   #   - filebeat
   #   networks:
   #     - elastic
   #   #logging:
   #   #  driver: none #suppress all logging
 
-  # elasticsearch:
-  #   container_name: elasticsearch
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
-  #   ports:
-  #     - 9200:9200
-  #   volumes:
-  #     - /c/temp/_DockerCompose/elasticsearch-data:/usr/share/elasticsearch/data
-  #   environment:
-  #     - xpack.watcher.enabled=false
-  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  #     - discovery.type=single-node
-  #   networks:
-  #     - elastic
+  elasticsearch-svc:
+    #image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+    container_name: elasticsearch-svc
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - /c/temp/_DockerCompose/elasticsearch/data:/usr/share/elasticsearch/data
+      - /c/temp/_DockerCompose/elasticsearch/logs:/usr/share/elasticsearch/logs
+    environment:
+      - xpack.watcher.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    #networks:
+    #  - elastic
 
-  # kibana:
-  #   container_name: kibana
-  #   image: docker.elastic.co/kibana/kibana:7.9.3
-  #   ports:
-  #     - 5601:5601
-  #   depends_on:
-  #     - elasticsearch
-  #   environment:
-  #     - ELASTICSEARCH_URL=http://localhost:9200
-  #   networks:
-  #     - elastic
+  kibana-svc:
+    container_name: kibana-svc
+    image: docker.elastic.co/kibana/kibana:7.11.1
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch-svc
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch-svc:9200
+      #- ELASTICSEARCH_HOSTS='["http://elasticsearch-svc:9200"]'
+    #networks:
+    #  - elastic
 
   # #https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
   # filebeat:
@@ -56,7 +60,6 @@ services:
   #     - /var/lib/docker:/var/lib/docker:ro
   #   networks:
   #     - elastic
-
   #https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver15&preserve-view=true&pivots=cs1-powershell
   #https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-docker-container-deployment
   #docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Pas.sword@12345' -p 1433:1433 --name mssql -h mssql -d mcr.microsoft.com/mssql/server:2019-latest
