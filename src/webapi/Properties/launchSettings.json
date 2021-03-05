@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "ConsoleApp": {
+    "webapi": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "weatherforecast",
