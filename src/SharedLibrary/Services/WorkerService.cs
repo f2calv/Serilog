@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SerilogTimings;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -56,7 +57,13 @@ namespace CasCap.Services
                     _logger.LogError(ex, "indexof failed");
                 }
 
-                await Task.Delay(5_000, stoppingToken);
+
+
+                using (Operation.Time("Submitting payment for {OrderId}", 123))
+                {
+                    // Timed block of code goes here
+                    await Task.Delay(5_000, stoppingToken);
+                }
             }
         }
     }
