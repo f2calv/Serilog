@@ -31,11 +31,8 @@ Log.Logger = new LoggerConfiguration()
         r => new { dt = r.utcNow, sid = r.id.ToString(), wibble = "wobble" })
 
     //.WriteTo.Console()
-    .WriteTo.Console(
-        outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
-    .WriteTo.File("log.txt",
-        rollingInterval: RollingInterval.Day,
-        rollOnFileSizeLimit: true)
+    .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
+    .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
     //.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
     //{
     //    //IndexFormat = "workerservice-{0:yyyy.MM.dd}",
