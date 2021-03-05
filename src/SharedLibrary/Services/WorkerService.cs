@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using CasCap.Models;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SerilogTimings;
 using System;
