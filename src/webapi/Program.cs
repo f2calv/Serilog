@@ -4,6 +4,8 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using Serilog.Core;
 using Serilog.Enrichers;
@@ -15,10 +17,13 @@ using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 //preload basic serilog settings from local json file
-var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true).Build();
+var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddJsonFile($"appsettings.{environment}.json", optional: true).Build();
 var loggerConfiguration = new LoggerConfiguration().ReadFrom.Configuration(configuration);
 var appInsightsConfig = configuration.GetSection($"{nameof(CasCap)}:{nameof(AppInsightsConfig)}").Get<AppInsightsConfig>();
 var connectionStrings = configuration.GetSection(nameof(ConnectionStrings)).Get<ConnectionStrings>();
@@ -44,6 +49,7 @@ Log.Logger = loggerConfiguration
     .Enrich.WithExceptionDetails()
     .Enrich.WithAssemblyName()
     .Enrich.WithOpenTracingContext()
+    .Enrich.WithProperty("ApplicationContext", AppDomain.CurrentDomain.FriendlyName)
     .Enrich.WithProperty("Version", "1.0.0")//const enricher
     .Enrich.With(new ThreadIdEnricher())//dynamic enricher
 
@@ -53,7 +59,7 @@ Log.Logger = loggerConfiguration
     .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
 
     .WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)//local development pretty print console logging
-    .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
+    //.WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
     //.WriteTo.Console(new ElasticsearchJsonFormatter())
     //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production+filebeat
 
@@ -67,21 +73,37 @@ Log.Logger = loggerConfiguration
     {
         //IndexFormat = "workerservice-{0:yyyy.MM.dd}",
         //IndexFormat = AppDomain.CurrentDomain.FriendlyName + "-{0:yyyy.MM}",
-        //IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+        //IndexFormat = "AdminLogs-{0:yyyy.MM.dd}",
+        IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
         AutoRegisterTemplate = true,
         AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
-        //IndexFormat = "AdminLogs-{0:yyyy.MM.dd}",
         //OverwriteTemplate = true,
         //RegisterTemplateFailure = RegisterTemplateRecovery.IndexToDeadletterIndex,
         EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
                            EmitEventFailureHandling.RaiseCallback |
                            EmitEventFailureHandling.ThrowException |
-                           EmitEventFailureHandling.WriteToSelfLog,
+                           EmitEventFailureHandling.WriteToFailureSink,
         FailureCallback = e =>
         {
             Log.Error("Unable to submit event {MessageTemplate}", e.MessageTemplate);
             //Console.WriteLine("Unable to submit event " + e.MessageTemplate);
-        }
+        },
+        BufferCleanPayload = (failingEvent, statuscode, exception) =>
+        {
+            dynamic e = JObject.Parse(failingEvent);
+            var d = new Dictionary<string, object>
+            {
+                { "@timestamp", e["@timestamp"]},
+                { "level", "Error"},
+                { "message", "Error: " + e.message},
+                { "messageTemplate", e.messageTemplate},
+                { "failingStatusCode", statuscode},
+                { "failingException", exception}
+            };
+            return JsonConvert.SerializeObject(d);
+        },
+        MinimumLogEventLevel = LogEventLevel.Verbose,
+        CustomFormatter = new ExceptionAsObjectJsonFormatter(renderMessage: true),
     })
 
     //.WriteTo.AzureAnalytics(workspaceId: < id removed >,

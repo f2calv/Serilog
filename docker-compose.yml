@@ -16,7 +16,6 @@ services:
   #   #  driver: none #suppress all logging
 
   elasticsearch-svc:
-    #image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
     image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
     container_name: elasticsearch-svc
     ports:
@@ -29,8 +28,23 @@ services:
       - xpack.watcher.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
-    #networks:
-    #  - elastic
+    # networks:
+    #   - elastic
+
+  logstash-src:
+    container_name: logstash-svc
+    image: docker.elastic.co/logstash/logstash:7.11.1
+    ports:
+      - 8080:8080
+    # volumes:
+    #   - /c/temp/_DockerCompose/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+    #   - /c/temp/_DockerCompose/logstash/pipeline:/usr/share/logstash/pipeline:ro
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch-svc
+    # networks:
+    #   - elastic
 
   kibana-svc:
     container_name: kibana-svc
@@ -40,10 +54,11 @@ services:
     depends_on:
       - elasticsearch-svc
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch-svc:9200
-      #- ELASTICSEARCH_HOSTS='["http://elasticsearch-svc:9200"]'
-    #networks:
-    #  - elastic
+      #- ELASTICSEARCH_URL=http://elasticsearch-svc:9200
+      - SERVER_NAME=http://kibana-svc:5601
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-svc:9200
+    # networks:
+    #   - elastic
 
   # #https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
   # filebeat:
