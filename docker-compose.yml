@@ -9,7 +9,10 @@ services:
     depends_on:
       - elasticsearch-svc
       - kibana-svc
-  #   #   - filebeat
+    #   #   - filebeat
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - DOTNET_RUNNING_IN_COMPOSE=${DOTNET_RUNNING_IN_COMPOSE}
   #   networks:
   #     - elastic
   #   #logging:

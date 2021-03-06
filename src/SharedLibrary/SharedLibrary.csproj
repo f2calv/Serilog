@@ -10,7 +10,7 @@
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
 	  <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
-	  <PackageReference Include="Seq.Extensions.Logging" Version="6.0.0" />
+	  <!-- <PackageReference Include="Seq.Extensions.Logging" Version="6.0.0" /> -->
 	  <!--<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.16.0" />-->
   </ItemGroup>
 
