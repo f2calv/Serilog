@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Events;
@@ -43,8 +44,9 @@ namespace CasCap
             }
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
+            logger.LogDebug("Configure is starting...");
             if (_env.IsDevelopment())
             {
                 SelfLog.Enable(msg => Console.WriteLine(msg));
@@ -61,6 +63,7 @@ namespace CasCap
             {
                 endpoints.MapControllers();
             });
+            logger.LogDebug("Configure has finished!");
         }
     }
 
