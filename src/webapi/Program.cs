@@ -114,14 +114,15 @@ Log.Logger = loggerConfiguration
     //    batchSize: 10
     //    )
 
-    //.WriteTo.AzureBlobStorage(connectionString: < connection str removed >,
-    //    restrictedToMinimumLevel: LogEventLevel.Debug,
-    //    storageContainerName: "test",//AppDomain.CurrentDomain.FriendlyName,
-    //    storageFileName: "{yyyy}/{MM}/{dd}/log.txt"
-    //    )
-
-    //.WriteTo.AzureTableStorage(connectionString: <connection str removed>,
-    //    storageTableName: AppDomain.CurrentDomain.FriendlyName)
+    .WriteTo.AzureBlobStorage(connectionString: connectionStrings.azureStorage,
+        restrictedToMinimumLevel: LogEventLevel.Debug,
+        storageContainerName: AppDomain.CurrentDomain.FriendlyName,
+        storageFileName: "{yyyy}/{MM}/{dd}/log.txt"
+        )
+    
+    //todo: get storage connection string from terraform and add to appsettings
+    .WriteTo.AzureTableStorage(connectionStrings.azureStorage,
+        storageTableName: AppDomain.CurrentDomain.FriendlyName)
 
     //serilog to redis?
 
