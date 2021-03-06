@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["Directory.build.props", "Directory.build.props"]
 COPY ["src/webapi/webapi.csproj", "src/webapi/"]
@@ -8,7 +8,7 @@ COPY . .
 
 RUN dotnet publish "src/webapi/webapi.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS final
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "webapi.dll"]
