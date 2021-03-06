@@ -59,9 +59,9 @@ Log.Logger = loggerConfiguration
     .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
 
     .WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)//local development pretty print console logging
-    //.WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
-    //.WriteTo.Console(new ElasticsearchJsonFormatter())
-    //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production+filebeat
+                                                                                      //.WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
+                                                                                      //.WriteTo.Console(new ElasticsearchJsonFormatter())
+                                                                                      //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production+filebeat
 
     .WriteTo.MSSqlServer(
         connectionString: connectionStrings.mssql,
@@ -123,8 +123,11 @@ Log.Logger = loggerConfiguration
     //.WriteTo.AzureTableStorage(connectionString: <connection str removed>,
     //    storageTableName: AppDomain.CurrentDomain.FriendlyName)
 
+    //serilog to redis?
+
     //.Filter.ByExcluding($"RequestPath like '/healthz%'")
     .CreateLogger();
+var result = 0;
 try
 {
     Log.Information("Starting {AppName}", AppDomain.CurrentDomain.FriendlyName);
@@ -140,11 +143,13 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "{AppName} terminated unexpectedly", AppDomain.CurrentDomain.FriendlyName);
+    result = 1;
 }
 finally
 {
     Log.CloseAndFlush();
 }
+return result;
 
 class ThreadIdEnricher : ILogEventEnricher
 {

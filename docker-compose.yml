@@ -1,14 +1,14 @@
 version: "3.8"
 
 services:
-  # webapi:
-  #   container_name: webapi
-  #   build:
-  #     context: .
-  #     dockerfile: src/webapi/Dockerfile
-  #   # depends_on:
-  #   #   - elasticsearch-svc
-  #   #   - kibana-svc
+  webapi:
+    container_name: webapi
+    build:
+      context: .
+      dockerfile: src/webapi/Dockerfile
+    depends_on:
+      - elasticsearch-svc
+      - kibana-svc
   #   #   - filebeat
   #   networks:
   #     - elastic
