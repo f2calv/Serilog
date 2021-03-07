@@ -8,13 +8,13 @@ services:
       dockerfile: src/webapi/Dockerfile
     depends_on:
       - elasticsearch-svc
-      - kibana-svc
+      - kibana
     #   #   - filebeat
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - DOTNET_RUNNING_IN_COMPOSE=${DOTNET_RUNNING_IN_COMPOSE}
   #   networks:
-  #     - elastic
+  #     - serilog
   #   #logging:
   #   #  driver: none #suppress all logging
 
@@ -32,36 +32,36 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
     # networks:
-    #   - elastic
+    #   - serilog
 
-  logstash-src:
-    container_name: logstash-svc
-    image: docker.elastic.co/logstash/logstash:7.11.1
-    ports:
-      - 8080:8080
-    # volumes:
-    #   - /c/temp/_DockerCompose/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-    #   - /c/temp/_DockerCompose/logstash/pipeline:/usr/share/logstash/pipeline:ro
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    depends_on:
-      - elasticsearch-svc
-    # networks:
-    #   - elastic
+  # logstash-src:
+  #   container_name: logstash-svc
+  #   image: docker.elastic.co/logstash/logstash:7.11.1
+  #   ports:
+  #     - 8080:8080
+  #   # volumes:
+  #   #   - /c/temp/_DockerCompose/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+  #   #   - /c/temp/_DockerCompose/logstash/pipeline:/usr/share/logstash/pipeline:ro
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #   depends_on:
+  #     - elasticsearch-svc
+  #   # networks:
+  #   #   - serilog
 
-  kibana-svc:
-    container_name: kibana-svc
+  kibana:
+    container_name: kibana
     image: docker.elastic.co/kibana/kibana:7.11.1
     ports:
       - 5601:5601
     depends_on:
       - elasticsearch-svc
     environment:
-      #- ELASTICSEARCH_URL=http://elasticsearch-svc:9200
-      - SERVER_NAME=http://kibana-svc:5601
-      - ELASTICSEARCH_HOSTS=http://elasticsearch-svc:9200
+      #- elasticsearch_URL=http://elasticsearch-svc:9200
+      - SERVER_NAME=http://kibana:5601
+      - elasticsearch_HOSTS=http://elasticsearch-svc:9200
     # networks:
-    #   - elastic
+    #   - serilog
 
   # #https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
   # filebeat:
@@ -77,10 +77,9 @@ services:
   #     - /var/run/docker.sock:/var/run/docker.sock
   #     - /var/lib/docker:/var/lib/docker:ro
   #   networks:
-  #     - elastic
+  #     - serilog
   #https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver15&preserve-view=true&pivots=cs1-powershell
   #https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-docker-container-deployment
-  #docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Pas.sword@12345' -p 1433:1433 --name mssql -h mssql -d mcr.microsoft.com/mssql/server:2019-latest
   #docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Pas.sword@12345" -p 1433:1433 --name mssql -h mssql --rm -it mcr.microsoft.com/mssql/server:2019-latest
   mssql-svc:
     #image: mcr.microsoft.com/mssql/server:2019-latest
@@ -99,7 +98,7 @@ services:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=Pas.sword@12345
     # networks:
-    #   - elastic
+    #   - serilog
 
   seq-svc:
     image: datalust/seq
@@ -114,10 +113,29 @@ services:
       - ACCEPT_EULA=Y
       - BASE_URI=http://seq-svc:5342
 
+  redis-svc:
+    container_name: redis-svc
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      #- ./_DockerCompose/redis:/data #fails with docker desktop 2.2 when running from inside users directory?
+      - /mnt/c/temp/_DockerCompose/redis:/data
+    entrypoint: redis-server --appendonly yes
+
+  p3x:
+    container_name: redisui
+    image: patrikx3/p3x-redis-ui
+    ports:
+      - 7843:7843
+    volumes:
+      # here you can set your own /home/user/p3x-redis-ui-settings folder
+      #- ./_DockerCompose/p3x-redis-ui-settings:/settings #fails with docker desktop 2.2 when running from inside users directory?
+      - /mnt/c/temp/_DockerCompose/p3x-redis-ui-settings:/settings
+    depends_on:
+      - redis-svc
+
 networks:
-  elastic:
+  serilog:
     driver: bridge
     #external: true
-
-volumes:
-  elasticsearch-data:

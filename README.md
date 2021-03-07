@@ -1,6 +1,7 @@
-# Serilog w/Elasticsearch Sink
+# Serilog Structured Logging w/Multiple Sinks
 
-Playground working with Serilog and the structured logging it provides which sends the log data to Elasticsearch and we can then view with Kibana.
+I need to write the README.md ...
+<!-- Playground working with Serilog and the structured logging it provides which sends the log data to Elasticsearch and we can then view with Kibana.
 
 To run the demo;
 
@@ -23,4 +24,4 @@ To run the demo;
 - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-5.0
 - https://softwareengineering.stackexchange.com/questions/312197/benefits-of-structured-logging-vs-basic-logging
 - https://github.com/justeat/NLog.StructuredLogging.Json#best-practices
-- https://github.com/serilog/serilog-sinks-elasticsearch
+- https://github.com/serilog/serilog-sinks-elasticsearch -->

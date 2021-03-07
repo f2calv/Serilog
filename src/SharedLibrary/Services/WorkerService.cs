@@ -18,17 +18,19 @@ namespace CasCap.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                _logger.LogDebug("Hello, Serilog!");
+
                 var utcNow = DateTime.UtcNow;
 
-                _logger.LogInformation($"Worker running at: {utcNow}");
+                _logger.LogInformation($"Worker running at: {utcNow} <--- string interpolation means no structured logging!");
 
                 _logger.LogInformation("Worker running at: {utcNow}", utcNow);
 
                 var fruit1 = new[] { "Apple", "Pear", "Orange" };
-                _logger.LogInformation("In my bowl I have {Fruit}", fruit1);
+                _logger.LogInformation("In my array bowl I have {@Fruit}", fruit1);
 
                 var fruit2 = new Dictionary<string, int> { { "Apple", 1 }, { "Pear", 5 } };
-                _logger.LogInformation("In my bowl I have {Fruit}", fruit2);
+                _logger.LogInformation("In my dictionary bowl I have {@Fruit}", fruit2);
 
                 var sensorInput = new { Latitude = 25, Longitude = 134 };
                 _logger.LogInformation("Processing {@SensorInput}", sensorInput);
@@ -39,9 +41,6 @@ namespace CasCap.Services
 
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 await Task.Delay(1000, stoppingToken);
-
-
-                _logger.LogDebug("Hello, Serilog!");
 
                 var position = new { Latitude = 25, Longitude = 134 };
                 var elapsedMs = 34;
