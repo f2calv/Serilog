@@ -2,13 +2,13 @@
 using CasCap.Models;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using Serilog.Core;
-using Serilog.Enrichers;
 using Serilog.Enrichers.OpenTracing;
 using Serilog.Events;
 using Serilog.Exceptions;
@@ -34,6 +34,16 @@ if (!string.IsNullOrWhiteSpace(appInsightsConfig.InstrumentationKey))
     var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
     telemetryConfiguration.InstrumentationKey = appInsightsConfig.InstrumentationKey;
     loggerConfiguration.WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces, restrictedToMinimumLevel: LogEventLevel.Debug);
+}
+
+if (!string.IsNullOrWhiteSpace(connectionStrings.mssql))
+{
+    if (!IsSqlServerOnline(connectionStrings.mssql))
+        Log.Error("Unable to connect to MSSQL :(");
+    else
+        loggerConfiguration.WriteTo.MSSqlServer(
+            connectionString: connectionStrings.mssql,
+            sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents", AutoCreateSqlTable = true });
 }
 
 var levelSwitch = new LoggingLevelSwitch();//this would have to be a singleton or something and passed in?
@@ -62,10 +72,6 @@ Log.Logger = loggerConfiguration
                                                                                       //.WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}] ({ThreadId}) {Message}{NewLine}{Exception}")
                                                                                       //.WriteTo.Console(new ElasticsearchJsonFormatter())
                                                                                       //.WriteTo.Console(new ExceptionAsObjectJsonFormatter())//or output as json object for production+filebeat
-
-    .WriteTo.MSSqlServer(
-        connectionString: connectionStrings.mssql,
-        sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents", AutoCreateSqlTable = true })
 
     .WriteTo.Seq(connectionStrings.seq)
 
@@ -119,8 +125,7 @@ Log.Logger = loggerConfiguration
         storageContainerName: AppDomain.CurrentDomain.FriendlyName,
         storageFileName: "{yyyy}/{MM}/{dd}/log.txt"
         )
-    
-    //todo: get storage connection string from terraform and add to appsettings
+
     .WriteTo.AzureTableStorage(connectionStrings.azureStorage,
         storageTableName: AppDomain.CurrentDomain.FriendlyName)
 
@@ -151,6 +156,22 @@ finally
     Log.CloseAndFlush();
 }
 return result;
+
+bool IsSqlServerOnline(string connectionString, int timeout = 5)
+{
+    using (var connection = new SqlConnection($"{connectionString};Connection Timeout={timeout}"))
+    {
+        try
+        {
+            connection.Open();
+            return true;
+        }
+        catch (SqlException)
+        {
+            return false;
+        }
+    }
+}
 
 class ThreadIdEnricher : ILogEventEnricher
 {
