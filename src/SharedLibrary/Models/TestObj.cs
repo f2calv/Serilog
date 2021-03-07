@@ -1,5 +1,5 @@
 ﻿using System;
-namespace CasCap
+namespace CasCap.Models
 {
     public class TestObj
     {
