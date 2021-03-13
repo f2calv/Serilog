@@ -7,7 +7,7 @@ namespace CasCap.Extensions
     {
         public static string GetCorrelationId(this HttpContext httpContext)
         {
-            httpContext.Request.Headers.TryGetValue("Cko-Correlation-Id", out StringValues correlationId);
+            httpContext.Request.Headers.TryGetValue("CC-Correlation-Id", out StringValues correlationId);
             return correlationId.FirstOrDefault() ?? httpContext.TraceIdentifier;
         }
     }
