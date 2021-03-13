@@ -23,8 +23,8 @@ services:
       - 9200:9200
       - 9300:9300
     volumes:
-      - ./.docker-compose/elasticsearch/data:/usr/share/elasticsearch/data
-      - ./.docker-compose/elasticsearch/logs:/usr/share/elasticsearch/logs
+      - ./.docker-compose/elasticsearch/data:/usr/share/elasticsearch/data #Note: if startup fails create these local folders by hand!
+      - ./.docker-compose/elasticsearch/logs:/usr/share/elasticsearch/logs #Note: if startup fails create these local folders by hand!
     environment:
       - xpack.watcher.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
