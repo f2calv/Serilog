@@ -1,6 +1,5 @@
 using System;
-
-namespace WebApiApp
+namespace CasCap
 {
     public class WeatherForecast
     {

@@ -10,7 +10,7 @@ namespace CasCap.Services
 {
     public class WorkerService : BackgroundService
     {
-        readonly ILogger<WorkerService> _logger;
+        readonly ILogger _logger;
 
         public WorkerService(ILogger<WorkerService> logger) => _logger = logger;
 
@@ -58,11 +58,28 @@ namespace CasCap.Services
                 }
 
 
+                //play with SerilogTimings...
+                var orderId = 123;
 
-                using (Operation.Time("Submitting payment for {OrderId}", 123))
+                using (Operation.Time("Submitting payment for {orderId}", orderId))
                 {
                     // Timed block of code goes here
-                    await Task.Delay(5_000, stoppingToken);
+                    await Task.Delay(2_000, stoppingToken);
+                }
+
+                using (var op = Operation.Begin("Retrieving order details for orderId {orderId}", orderId))
+                {
+                    // Timed block of code goes here
+                    await Task.Delay(2_000, stoppingToken);
+                    op.Complete();
+                }
+
+                using (var op = Operation.Begin("Queuing notifications for orderId {orderId}", orderId))
+                {
+                    var notificationCount = 3;
+                    // Timed block of code goes here
+                    await Task.Delay(2_000, stoppingToken);
+                    op.Complete(nameof(notificationCount), notificationCount);
                 }
             }
         }

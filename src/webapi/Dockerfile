@@ -10,7 +10,7 @@ RUN dotnet publish "src/webapi/webapi.csproj" -c Release -o /app/publish
 
 #can't use alpine for final due to mssql client library issues
 #https://github.com/dotnet/SqlClient/issues/220
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "webapi.dll"]

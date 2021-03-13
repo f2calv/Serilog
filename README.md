@@ -5,7 +5,6 @@ I need to write the README.md ...
 
 To run the demo;
 
-- In the _docker-compose.yml_ file edit the Elasticsearch volume `/c/temp/_DockerCompose/elasticsearch-data:/usr/share/elasticsearch/data` to point to a temporary location on your own system.
 - Execute `docker-compose up --build` from the root of the repo.
 - Navigate to http://localhost:9200 to check Elasticsearch is up and running.
 - Navigate to http://localhost:5601 to check Kibana is up and running.

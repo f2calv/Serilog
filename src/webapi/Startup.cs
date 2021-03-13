@@ -28,6 +28,7 @@ namespace CasCap
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(Log.Logger);//Note: this is only needed if we inject Serilog.ILogger instead of the Microsoft abstraction... see TestController
             services.AddControllers();
             services.AddHostedService<WorkerService>();
 
