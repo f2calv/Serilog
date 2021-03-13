@@ -47,12 +47,12 @@ if (!string.IsNullOrWhiteSpace(appInsightsConfig.InstrumentationKey))
 //https://github.com/serilog/serilog-sinks-mssqlserver
 if (!string.IsNullOrWhiteSpace(connectionStrings.mssql))
 {
-    if (!IsSqlServerOnline(connectionStrings.mssql))
-        Log.Error("Unable to connect to MSSQL :(");
-    else
-        loggerConfiguration.WriteTo.MSSqlServer(
-            connectionString: connectionStrings.mssql,
-            sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents", AutoCreateSqlTable = true });
+    //if (!IsSqlServerOnline(connectionStrings.mssql_check))
+    //    Log.Error("Unable to connect to MSSQL :(");
+    //else
+    loggerConfiguration.WriteTo.MSSqlServer(
+        connectionString: connectionStrings.mssql,
+        sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents", AutoCreateSqlTable = true });
 }
 else
     Log.Warning("No MSSQL connection string, skipping...");
@@ -207,7 +207,8 @@ return result;
 
 bool IsSqlServerOnline(string connectionString, int timeout = 5)
 {
-    using (var connection = new SqlConnection($"{connectionString};Connection Timeout={timeout}"))
+    var connectionString2 = $"{connectionString};Connection Timeout={timeout}";
+    using (var connection = new SqlConnection(connectionString2))
     {
         try
         {

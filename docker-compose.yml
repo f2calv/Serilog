@@ -53,9 +53,9 @@ services:
     depends_on:
       - elasticsearch
     environment:
-      #- elasticsearch_URL=http://elasticsearch:9200
-      - SERVER_NAME=http://kibana:5601
-      - elasticsearch_HOSTS=http://elasticsearch:9200
+      #- elasticsearch_URL=http://localhost:9200
+      - SERVER_NAME=http://localhost:5601
+      - elasticsearch_HOSTS=http://localhost:9200
     # networks:
     #   - serilog
 
@@ -104,7 +104,7 @@ services:
       - ./.docker-compose/seq/data:/data/
     environment:
       - ACCEPT_EULA=Y
-      - BASE_URI=http://seq:5342
+      - BASE_URI=http://localhost:5342
 
   redis:
     image: redis:alpine
