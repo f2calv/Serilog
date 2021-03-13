@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <!-- below added as not being picked-up by Directory.build.props why??  -->
-    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
