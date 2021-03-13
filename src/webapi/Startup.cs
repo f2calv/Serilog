@@ -1,3 +1,4 @@
+using CasCap.Middleware;
 using CasCap.Models;
 using CasCap.Services;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Prometheus;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Events;
@@ -47,24 +49,28 @@ namespace CasCap
 
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
-            logger.LogDebug("Configure is starting...");
+            logger.LogDebug("{methodName} is starting...", nameof(Configure));
             if (_env.IsDevelopment())
             {
                 SelfLog.Enable(msg => Console.WriteLine(msg));
                 app.UseDeveloperExceptionPage();
             }
-            //app.UseSerilogRequestLogging(options => { options.GetLevel = LogHelper.CustomGetLevel; });
-            app.UseSerilogRequestLogging();
 
             app.UseRouting();
+            app.UseHttpMetrics();
+            //app.UseSerilogRequestLogging(options => { options.GetLevel = LogHelper.CustomGetLevel; });
+            app.UseSerilogRequestLogging();//place after prometheus http metrics+healthchecks OR use a filter
 
             app.UseAuthorization();
+
+            app.UseMiddleware<RequestLogContextMiddleware>();//serilog example use of LogContext to correlate logs
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapMetrics();
             });
-            logger.LogDebug("Configure has finished!");
+            logger.LogDebug("{methodName} has finished!", nameof(Configure));
         }
     }
 

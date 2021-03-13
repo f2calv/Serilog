@@ -26,6 +26,11 @@ namespace CasCap.Services
 
                 _logger.LogInformation("Worker running at: {utcNow}", utcNow);
 
+                _logger
+                    //annoying namespace conflicts...
+                    //.ForContext(nameof(Environment.MachineName), Environment.MachineName)//example use of ForContext to include properties and have terser messages
+                    .LogInformation("Worker running at: {utcNow}", utcNow);
+
                 var fruit1 = new[] { "Apple", "Pear", "Orange" };
                 _logger.LogInformation("In my array bowl I have {@Fruit}", fruit1);
 
@@ -60,26 +65,30 @@ namespace CasCap.Services
 
                 //play with SerilogTimings...
                 var orderId = 123;
+                var customerId = 123;
 
-                using (Operation.Time("Submitting payment for {orderId}", orderId))
+                using (Serilog.Context.LogContext.PushProperty(nameof(customerId), customerId))//lets add additional info to each nested logging request
                 {
-                    // Timed block of code goes here
-                    await Task.Delay(2_000, stoppingToken);
-                }
+                    using (Operation.Time("Submitting payment for {orderId}", orderId))
+                    {
+                        // Timed block of code goes here
+                        await Task.Delay(2_000, stoppingToken);
+                    }
 
-                using (var op = Operation.Begin("Retrieving order details for orderId {orderId}", orderId))
-                {
-                    // Timed block of code goes here
-                    await Task.Delay(2_000, stoppingToken);
-                    op.Complete();
-                }
+                    using (var op = Operation.Begin("Retrieving order details for orderId {orderId}", orderId))
+                    {
+                        // Timed block of code goes here
+                        await Task.Delay(2_000, stoppingToken);
+                        op.Complete();
+                    }
 
-                using (var op = Operation.Begin("Queuing notifications for orderId {orderId}", orderId))
-                {
-                    var notificationCount = 3;
-                    // Timed block of code goes here
-                    await Task.Delay(2_000, stoppingToken);
-                    op.Complete(nameof(notificationCount), notificationCount);
+                    using (var op = Operation.Begin("Queuing notifications for orderId {orderId}", orderId))
+                    {
+                        var notificationCount = 3;
+                        // Timed block of code goes here
+                        await Task.Delay(2_000, stoppingToken);
+                        op.Complete(nameof(notificationCount), notificationCount);
+                    }
                 }
             }
         }
