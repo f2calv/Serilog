@@ -1,3 +1,4 @@
+using CasCap.Common.Logging;
 using CasCap.Middleware;
 using CasCap.Models;
 using CasCap.Services;
@@ -47,8 +48,10 @@ namespace CasCap
             }
         }
 
-        public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory, ILogger<Startup> logger)
         {
+            ApplicationLogging.LoggerFactory = loggerFactory;//access the same logger from static instances
+
             logger.LogDebug("{methodName} is starting...", nameof(Configure));
             if (_env.IsDevelopment())
             {

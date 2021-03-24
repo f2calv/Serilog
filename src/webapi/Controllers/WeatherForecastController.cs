@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CasCap.Extensions;
 namespace CasCap.Controllers
 {
     [ApiController]
@@ -21,6 +22,7 @@ namespace CasCap.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            _ = Environment.MachineName.TestStaticLogger();
             _logger.LogInformation("web api controller {controllerName} method {methodName} hit", nameof(WeatherForecastController), nameof(Get));
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
