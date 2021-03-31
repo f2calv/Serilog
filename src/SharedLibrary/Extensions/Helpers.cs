@@ -7,7 +7,7 @@ namespace CasCap.Extensions
 {
     public static class Helpers
     {
-        static readonly ILogger _logger = ApplicationLogging.CreateLogger(typeof(Helpers).ToString());
+        static readonly ILogger _logger = ApplicationLogging.CreateLogger(nameof(Helpers));
 
         const string keyCorrelationId = "CC-Correlation-Id";
 
