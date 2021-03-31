@@ -5,9 +5,9 @@ using Microsoft.Extensions.Primitives;
 using System.Linq;
 namespace CasCap.Extensions
 {
-    public static class Helpers
+    public static class SharedLibraryHelpers
     {
-        static readonly ILogger _logger = ApplicationLogging.CreateLogger(nameof(Helpers));
+        static readonly ILogger _logger = ApplicationLogging.CreateLogger(nameof(SharedLibraryHelpers));
 
         const string keyCorrelationId = "CC-Correlation-Id";
 
