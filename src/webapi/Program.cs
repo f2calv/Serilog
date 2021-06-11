@@ -125,7 +125,7 @@ if (!string.IsNullOrWhiteSpace(connectionStrings.azurestorageaccount))
         storageTableName: AppDomain.CurrentDomain.FriendlyName);
 }
 else
-    Log.Warning("No Elasticsearch connection string, skipping...");
+    Log.Warning("No azurestorageaccount connection string, skipping...");
 
 if (false)
 {
@@ -179,7 +179,7 @@ Log.Logger = loggerConfiguration
     .Destructure.ByTransforming<TestObj>(
         r => new { dt = r.utcNow, sid = r.id.ToString(), wibble = "wobble" })
 
-    //.Filter.ByExcluding($"RequestPath like '/healthz%'")
+    .Filter.ByExcluding($"RequestPath like '/healthz%'")
     .CreateLogger();
 var result = 0;
 try
