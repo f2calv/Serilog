@@ -155,8 +155,8 @@ if (true)
 //https://github.com/serilog/serilog-sinks-file
 if (true)
 {
-    loggerConfiguration.WriteTo.File($"{AppDomain.CurrentDomain.FriendlyName}.log", rollingInterval: RollingInterval.Day, buffered: true);
-    loggerConfiguration.WriteTo.File(new JsonFormatter(), $"{AppDomain.CurrentDomain.FriendlyName}.json.log", rollingInterval: RollingInterval.Day, buffered: true);
+    loggerConfiguration.WriteTo.File($"{AppDomain.CurrentDomain.FriendlyName}.log", rollingInterval: RollingInterval.Day, buffered: true, retainedFileCountLimit: 3);
+    loggerConfiguration.WriteTo.File(new JsonFormatter(), $"{AppDomain.CurrentDomain.FriendlyName}.json.log", rollingInterval: RollingInterval.Day, buffered: true, retainedFileCountLimit: 3);
 }
 
 var levelSwitch = new LoggingLevelSwitch();//this would have to be a singleton or something and passed in?
