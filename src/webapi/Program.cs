@@ -12,11 +12,11 @@ using Serilog.Core;
 using Serilog.Enrichers.OpenTracing;
 using Serilog.Events;
 using Serilog.Exceptions;
-using Serilog.Formatting.Compact;
 using Serilog.Formatting.Elasticsearch;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.File;
+using Serilog.Sinks.Grafana.Loki;
 using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.Redis.List;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -62,6 +62,12 @@ if (!string.IsNullOrWhiteSpace(connectionStrings.seq))
     loggerConfiguration.WriteTo.Seq(connectionStrings.seq);
 else
     Log.Warning("No Seq connection string, skipping...");
+
+//https://github.com/serilog-contrib/serilog-sinks-grafana-loki
+if (!string.IsNullOrWhiteSpace(connectionStrings.loki))
+    loggerConfiguration.WriteTo.GrafanaLoki(connectionStrings.loki);
+else
+    Log.Warning("No Loki connection string, skipping...");
 
 //https://github.com/serilog/serilog-sinks-elasticsearch
 if (!string.IsNullOrWhiteSpace(connectionStrings.elasticsearch))

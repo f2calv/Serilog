@@ -44,6 +44,7 @@ namespace CasCap
                     options.EnablePerformanceCounterCollectionModule = false;
                     options.DeveloperMode = _env.IsDevelopment();
                     options.InstrumentationKey = appInsightsConfig.InstrumentationKey;
+                    options.EnableAdaptiveSampling = _env.IsProduction();
                 });
             }
         }

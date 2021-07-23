@@ -106,6 +106,12 @@ services:
       - ACCEPT_EULA=Y
       - BASE_URI=http://localhost:5342
 
+  loki:
+    image: grafana/loki
+    restart: always
+    ports:
+      - 3100:3100
+
   redis:
     image: redis:alpine
     ports:
