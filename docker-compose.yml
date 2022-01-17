@@ -129,7 +129,7 @@ services:
     depends_on:
       - redis
 
-networks:
-  serilog:
-    driver: bridge
-    #external: true
+# networks:
+#   serilog:
+#     driver: bridge
+#     #external: true

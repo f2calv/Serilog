@@ -2,7 +2,6 @@
 using CasCap.Models;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -24,7 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 //load connection strings
@@ -211,29 +209,27 @@ finally
 }
 return result;
 
-bool IsSqlServerOnline(string connectionString, int timeout = 5)
-{
-    var connectionString2 = $"{connectionString};Connection Timeout={timeout}";
-    using (var connection = new SqlConnection(connectionString2))
-    {
-        try
-        {
-            connection.Open();
-            return true;
-        }
-        catch (SqlException)
-        {
-            return false;
-        }
-    }
-}
+//static bool IsSqlServerOnline(string connectionString, int timeout = 5)
+//{
+//    var connectionString2 = $"{connectionString};Connection Timeout={timeout}";
+//    using var connection = new SqlConnection(connectionString2);
+//    try
+//    {
+//        connection.Open();
+//        return true;
+//    }
+//    catch (SqlException)
+//    {
+//        return false;
+//    }
+//}
 
 class ThreadIdEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(
-            "ThreadId", Thread.CurrentThread.ManagedThreadId));
+            "ThreadId", Environment.CurrentManagedThreadId));
     }
 }
 
