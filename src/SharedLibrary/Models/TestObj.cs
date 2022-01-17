@@ -1,11 +1,9 @@
-﻿using System;
-namespace CasCap.Models
+﻿namespace CasCap.Models;
+
+public class TestObj
 {
-    public class TestObj
-    {
-        public int id { get; set; } = DateTime.UtcNow.Millisecond;
-        public DateTime utcNow { get; set; } = DateTime.UtcNow;
-        public string strDate { get; set; } = DateTime.UtcNow.ToString();
-        public Guid uniqueId { get; set; } = Guid.NewGuid();
-    }
+    public int id { get; set; } = DateTime.UtcNow.Millisecond;
+    public DateTime utcNow { get; set; } = DateTime.UtcNow;
+    public string strDate { get; set; } = DateTime.UtcNow.ToString();
+    public Guid uniqueId { get; set; } = Guid.NewGuid();
 }

@@ -1,7 +1,6 @@
-﻿namespace CasCap.Models
+﻿namespace CasCap.Models;
+
+public class AppInsightsConfig
 {
-    public class AppInsightsConfig
-    {
-        public string InstrumentationKey { get; set; }
-    }
+    public string? InstrumentationKey { get; set; }
 }

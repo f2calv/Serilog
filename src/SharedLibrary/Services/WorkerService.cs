@@ -2,10 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SerilogTimings;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 namespace CasCap.Services
 {
     public class WorkerService : BackgroundService
@@ -54,8 +50,8 @@ namespace CasCap.Services
 
                 try
                 {
-                    string test = null;
-                    var indexOf = test.IndexOf(':');
+                    string? test = null;
+                    var indexOf = test!.IndexOf(':');
                 }
                 catch (Exception ex)
                 {

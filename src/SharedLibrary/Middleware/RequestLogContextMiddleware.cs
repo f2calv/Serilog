@@ -1,24 +1,22 @@
 ﻿using CasCap.Extensions;
 using Microsoft.AspNetCore.Http;
 using Serilog.Context;
-using System.Threading.Tasks;
-namespace CasCap.Middleware
+namespace CasCap.Middleware;
+
+public class RequestLogContextMiddleware
 {
-    public class RequestLogContextMiddleware
+    readonly RequestDelegate _next;
+
+    public RequestLogContextMiddleware(RequestDelegate next)
     {
-        readonly RequestDelegate _next;
+        _next = next;
+    }
 
-        public RequestLogContextMiddleware(RequestDelegate next)
+    public Task Invoke(HttpContext context)
+    {
+        using (LogContext.PushProperty("CorrelationId", context.GetCorrelationId()))
         {
-            _next = next;
-        }
-
-        public Task Invoke(HttpContext context)
-        {
-            using (LogContext.PushProperty("CorrelationId", context.GetCorrelationId()))
-            {
-                return _next.Invoke(context);
-            }
+            return _next.Invoke(context);
         }
     }
 }

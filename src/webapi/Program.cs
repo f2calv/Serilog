@@ -1,9 +1,6 @@
 ﻿using CasCap;
 using CasCap.Models;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -19,9 +16,6 @@ using Serilog.Sinks.Grafana.Loki;
 using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.Redis.List;
 using Serilog.Sinks.SystemConsole.Themes;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
@@ -101,7 +95,7 @@ if (!string.IsNullOrWhiteSpace(connectionStrings.elasticsearch))
                 { "level", "Error"},
                 { "message", "Error: " + e.message},
                 { "messageTemplate", e.messageTemplate},
-                { "failingStatusCode", statuscode},
+                { "failingStatusCode", statuscode!},
                 { "failingException", exception}
            };
             return JsonConvert.SerializeObject(d);
@@ -243,7 +237,7 @@ internal class EsPropertyTypeNamedFormatter : ElasticsearchJsonFormatter
         foreach (KeyValuePair<string, LogEventPropertyValue> property in properties)
         {
             char type;
-            object value;
+            object? value;
 
             // Modify property name
             if (property.Value is ScalarValue asScalar)
