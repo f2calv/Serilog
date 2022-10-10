@@ -32,7 +32,7 @@ if (connectionStrings == null) throw new Exception($"Unable to load {nameof(Conn
 if (!string.IsNullOrWhiteSpace(appInsightsConfig.InstrumentationKey))
 {
     var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
-    telemetryConfiguration.InstrumentationKey = appInsightsConfig.InstrumentationKey;
+    telemetryConfiguration.ConnectionString = $"InstrumentationKey={appInsightsConfig.InstrumentationKey};";
     loggerConfiguration.WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces, restrictedToMinimumLevel: LogEventLevel.Debug);
 }
 

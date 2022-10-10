@@ -35,7 +35,7 @@ public class Startup
                 options.EnableDependencyTrackingTelemetryModule = false;
                 options.EnablePerformanceCounterCollectionModule = false;
                 options.DeveloperMode = _env.IsDevelopment();
-                options.InstrumentationKey = appInsightsConfig.InstrumentationKey;
+                options.ConnectionString = $"InstrumentationKey={appInsightsConfig.InstrumentationKey};";
                 options.EnableAdaptiveSampling = _env.IsProduction();
             });
         }
