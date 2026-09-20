@@ -1,5 +1,9 @@
 # Serilog Structured Logging w/Multiple Sinks
 
+> [!IMPORTANT]
+> This repository has been retired and is no longer maintained. It is retained for historical
+> reference and should not be treated as supported or secure production guidance.
+
 I need to write the README.md ...
 <!-- Playground working with Serilog and the structured logging it provides which sends the log data to Elasticsearch and we can then view with Kibana.
 
